@@ -1,0 +1,15 @@
+/config/php.ini
+/bin/composer.phar
+**/node_modules/
+**/dist/
+**/out/
+**/.DS_Store
+etl/spool/
+backend/public/app/
+backend/.env
+backend/database/*.sqlite
+backend/vendor/
+*.log
+__pycache__/
+*.pyc
+.venv/

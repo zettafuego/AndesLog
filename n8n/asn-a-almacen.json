@@ -1,0 +1,91 @@
+{
+  "name": "AndesLog — ASN a almacén",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "andeslog-asn",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8d6a1c2e-1b7a-4e0a-9c11-0a0a0a000001",
+      "name": "Webhook ASN",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "andeslog-asn"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/api/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"code\":\"OP-LIMA-01\",\"pin\":\"1847\"}",
+        "options": {}
+      },
+      "id": "8d6a1c2e-1b7a-4e0a-9c11-0a0a0a000002",
+      "name": "Login de servicio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/api/ai/brief",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Login de servicio').item.json.token }}"
+            },
+            {
+              "name": "Idempotency-Key",
+              "value": "=n8n-asn-{{ $now.toMillis() }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"note\": {{ JSON.stringify($('Webhook ASN').item.json.body) }} }",
+        "options": {}
+      },
+      "id": "8d6a1c2e-1b7a-4e0a-9c11-0a0a0a000003",
+      "name": "Brief con Ollama o regla local",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, source: $json.source, brief: $json.brief } }}"
+      },
+      "id": "8d6a1c2e-1b7a-4e0a-9c11-0a0a0a000004",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1020, 300]
+    }
+  ],
+  "connections": {
+    "Webhook ASN": {
+      "main": [[{ "node": "Login de servicio", "type": "main", "index": 0 }]]
+    },
+    "Login de servicio": {
+      "main": [[{ "node": "Brief con Ollama o regla local", "type": "main", "index": 0 }]]
+    },
+    "Brief con Ollama o regla local": {
+      "main": [[{ "node": "Responder", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "notas": "Importar en n8n. El brief lo resuelve Laravel: Ollama si responde, si no la regla local. El CSV de ASN lo carga etl/recepcion_csv.py, que ya manda Idempotency-Key."
+  },
+  "pinData": {}
+}

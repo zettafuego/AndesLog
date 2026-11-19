@@ -1,0 +1,16 @@
+{
+  "name": "andeslog-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Carcasa Electron-Vite de AndesLog. La interfaz vive en ../frontend.",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-vite": "^4.0.0"
+  }
+}

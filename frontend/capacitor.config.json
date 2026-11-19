@@ -1,0 +1,19 @@
+{
+  "appId": "art.wafflestech.andeslog",
+  "appName": "AndesLog",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "BackgroundRunner": {
+      "label": "art.wafflestech.andeslog.sync",
+      "src": "background/sync.js",
+      "event": "andeslogSync",
+      "repeat": true,
+      "interval": 15,
+      "autoStart": true
+    }
+  }
+}
